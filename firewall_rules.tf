@@ -1,5 +1,5 @@
 # =========================================================
-#  1. Firewall Policy (obligatoire pour Azure Firewall Basic)
+#  1. Firewall Policy
 # =========================================================
 resource "azurerm_firewall_policy" "fw_policy" {
   name                = "fwpolicy-juiceshop"
@@ -9,14 +9,14 @@ resource "azurerm_firewall_policy" "fw_policy" {
 }
 
 # =========================================================
-#  2. Groupe de règles Firewall
+#  2. Rule Collection Group
 # =========================================================
 resource "azurerm_firewall_policy_rule_collection_group" "rules" {
   name               = "rcg-juiceshop"
   firewall_policy_id = azurerm_firewall_policy.fw_policy.id
   priority           = 100
 
-  # =========================================================
+    # =========================================================
   #  DNAT : Exposer ton application (Ingress NGINX)
   # =========================================================
   nat_rule_collection {
@@ -24,15 +24,6 @@ resource "azurerm_firewall_policy_rule_collection_group" "rules" {
     priority = 100
     action   = "Dnat"
 
-    rule {
-      name                = "allow-http-inbound"
-      protocols           = ["TCP"]
-      source_addresses    = ["*"]
-      destination_address = azurerm_public_ip.fw_pip.ip_address
-      destination_ports   = ["80"]
-      translated_address  = "10.0.1.6"
-      translated_port     = "80"
-    }
     rule {
       name                = "allow-https-inbound"
       protocols           = ["TCP"]
@@ -44,51 +35,55 @@ resource "azurerm_firewall_policy_rule_collection_group" "rules" {
     }
   }
 
+
   # =========================================================
-  #  NETWORK RULES : Communication réseau essentielle AKS
+  # 🔵 NETWORK RULES (CRITICAL — DO NOT SKIP)
   # =========================================================
   network_rule_collection {
     name     = "aks-network-rules"
     priority = 200
     action   = "Allow"
 
-    # -----------------------------------------
-    #  DNS  sortant (Network rule)
-    # -----------------------------------------
+    # ✅ DNS
     rule {
-      name                  = "allow-dns-and-https-outbound"
+      name                  = "allow-dns"
       protocols             = ["UDP", "TCP"]
       source_addresses      = ["10.0.1.0/24"]
       destination_addresses = ["*"]
       destination_ports     = ["53"]
     }
 
-    # -----------------------------------------
-    # Autoriser API Kubernetes  (Network rule)
-    # -----------------------------------------
+    # ✅ HTTPS outbound 
     rule {
-      name                  = "allow-aks-api"
+      name                  = "allow-https-outbound"
       protocols             = ["TCP"]
       source_addresses      = ["10.0.1.0/24"]
-      destination_addresses = ["10.1.0.0/16"]
+      destination_addresses = ["*"]
       destination_ports     = ["443"]
     }
 
-    # ----------------------------------------------------------
-    #  CRITIQUE : Communication interne entre les composants AKS
-    # ----------------------------------------------------------
+    # ✅ HTTP
     rule {
-      name                  = "allow-aks-internal-communication"
+      name                  = "allow-http-outbound"
       protocols             = ["TCP"]
       source_addresses      = ["10.0.1.0/24"]
-      destination_addresses = ["10.0.0.0/16"]
-      destination_ports     = ["443", "10250"]
+      destination_addresses = ["*"]
+      destination_ports     = ["80"]
     }
 
+
+    # ✅ External AKS IP access inbound
+    rule {
+      name                  = "allow-aks"
+      protocols             = ["TCP"]
+      source_addresses      = ["*"]
+      destination_addresses = ["10.0.1.0/24"]
+      destination_ports     = ["443"]
+    }
   }
 
   # =========================================================
-  #  APPLICATION RULES : Accès Internet (Docker, Helm, Azure)
+  # 🟢 APPLICATION RULES (FQDN filtering)
   # =========================================================
   application_rule_collection {
     name     = "aks-app-rules"
@@ -96,53 +91,19 @@ resource "azurerm_firewall_policy_rule_collection_group" "rules" {
     action   = "Allow"
 
     rule {
-      name             = "allow-external-services"
+      name             = "allow-aks-required-fqdns"
       source_addresses = ["10.0.1.0/24"]
 
-      destination_fqdns = [
+      destination_fqdns = ["*"]
 
-        "registry.k8s.io",
-        "*.registry.k8s.io",
-
-        # backend réel utilisé par registry.k8s.io
-        "*.pkg.dev",
-        "us-east4-docker.pkg.dev",
-        "*.amazonaws.com",
-        "*.s3.amazonaws.com",
-        "*.s3.dualstack.us-east-1.amazonaws.com",
-        "*.pkg.dev",
-
-        #  Docker / Images
-        "quay.io",
-        "*.quay.io",
-
-        "*.docker.io",
-        "production.cloudflare.docker.com",
-
-        #  GitHub (Helm charts, manifests)
-        "github.com",
-        "*.githubusercontent.com",
-
-        #  Cert-manager (Let's Encrypt)
-        "acme-v02.api.letsencrypt.org",
-
-        #  Azure
-        "mcr.microsoft.com",
-        "*.data.mcr.microsoft.com",
-        "management.azure.com",
-        "login.microsoftonline.com",
-        "*.hcp.${var.location}.azmk8s.io"
-      ]
-
-      # HTTP + HTTPS
       protocols {
-        port = "80"
         type = "Http"
+        port = 80
       }
 
       protocols {
-        port = "443"
         type = "Https"
+        port = 443
       }
     }
   }
