@@ -6,6 +6,8 @@ resource "azurerm_firewall_policy" "fw_policy" {
   resource_group_name = var.resource_group_name
   location            = var.location
   sku                 = "Basic"
+
+  depends_on          = [azurerm_resource_group.rg]
 }
 
 # =========================================================
@@ -25,9 +27,9 @@ resource "azurerm_firewall_policy_rule_collection_group" "rules" {
     action   = "Dnat"
 
     rule {
-      name                = "allow-https-inbound"
+      name                = "allow-https-from-f5-waf"
       protocols           = ["TCP"]
-      source_addresses    = ["*"]
+      source_addresses    = ["48.217.49.246"] #F5 public IP 
       destination_address = azurerm_public_ip.fw_pip.ip_address
       destination_ports   = ["443"]
       translated_address  = "10.0.1.6"
@@ -53,6 +55,30 @@ resource "azurerm_firewall_policy_rule_collection_group" "rules" {
       destination_ports     = ["53"]
     }
 
+    rule {
+      name                  = "allow-aks-udp-1194"
+      protocols             = ["UDP"]
+      source_addresses      = ["10.0.1.0/24"]
+      destination_addresses = ["*"]
+      destination_ports     = ["1194"]
+    }
+
+    rule {
+      name                  = "allow-aks-tcp-9000"
+      protocols             = ["TCP"]
+      source_addresses      = ["10.0.1.0/24"]
+      destination_addresses = ["*"]
+      destination_ports     = ["9000"]
+    }
+
+    rule {
+      name                  = "allow-ntp"
+      protocols             = ["UDP"]
+      source_addresses      = ["10.0.1.0/24"]
+      destination_addresses = ["*"]
+      destination_ports     = ["123"]
+    }
+
     # ✅ HTTPS outbound 
     rule {
       name                  = "allow-https-outbound"
@@ -76,7 +102,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "rules" {
     rule {
       name                  = "allow-aks"
       protocols             = ["TCP"]
-      source_addresses      = ["*"]
+      source_addresses      = ["48.217.49.246"]
       destination_addresses = ["10.0.1.0/24"]
       destination_ports     = ["443"]
     }

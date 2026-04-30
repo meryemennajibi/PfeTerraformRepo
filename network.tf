@@ -19,6 +19,14 @@ resource "azurerm_subnet" "aks_subnet" {
   address_prefixes     = ["10.0.1.0/24"]
 }
 
+#kali subnet
+resource "azurerm_subnet" "kali_subnet" {
+  name                 = "snet-kali"
+  resource_group_name  = var.resource_group_name
+  virtual_network_name = azurerm_virtual_network.vnet.name
+  address_prefixes     = ["10.0.4.0/24"]
+}
+
 resource "azurerm_route_table" "aks_udr" {
   name                = "rt-aks"
   location            = var.location

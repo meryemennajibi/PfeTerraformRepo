@@ -1,5 +1,5 @@
 variable "resource_group_name" {
-  default = "rg-aks-siso" 
+  default = "rg-aks-siso"
 }
 
 variable "location" {
@@ -12,4 +12,10 @@ variable "aks_cluster_name" {
 
 variable "ad_group_name" {
   default = "aks-admins" # Le nom exact du groupe Entra ID
+}
+
+variable "kali_admin_paswd" {
+  description = "Admin password for Kali VM"
+  type        = string
+  sensitive   = true
 }

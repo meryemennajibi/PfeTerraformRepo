@@ -5,8 +5,8 @@ resource "azurerm_network_security_group" "aks_nsg" {
   resource_group_name = "rg-aks-siso"
 
   tags = {
-    Project     = "PFE-Cloud-Security"
-    ManagedBy   = "Terraform"
+    Project   = "PFE-Cloud-Security"
+    ManagedBy = "Terraform"
   }
 
   depends_on = [azurerm_resource_group.rg]
@@ -82,8 +82,8 @@ resource "azurerm_monitor_diagnostic_setting" "nsg_security_logs" {
 
 # 4. ASSOCIATION (Lien avec Subnet existant)
 resource "azurerm_subnet_network_security_group_association" "aks_nsg_assoc" {
-  
-  subnet_id                 = azurerm_subnet.aks_subnet.id 
+
+  subnet_id                 = azurerm_subnet.aks_subnet.id
   network_security_group_id = azurerm_network_security_group.aks_nsg.id
 
   depends_on = [azurerm_network_security_group.aks_nsg]

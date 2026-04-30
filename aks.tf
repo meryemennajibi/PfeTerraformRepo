@@ -3,16 +3,6 @@ data "azuread_group" "aks_admins" {
   security_enabled = true
 }
 
-# 2. Création du Workspace 
-resource "azurerm_log_analytics_workspace" "law" {
-  name                = "law-aks-project"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  sku                 = "PerGB2018"
-  retention_in_days   = 30
-
-  depends_on = [azurerm_resource_group.rg]
-} 
 
 ##########
 
@@ -42,9 +32,9 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
   # Bloc RBAC 
   azure_active_directory_role_based_access_control {
-    managed                = true
-    azure_rbac_enabled     = true
-    
+    managed            = true
+    azure_rbac_enabled = true
+
     admin_group_object_ids = [data.azuread_group.aks_admins.object_id]
   }
 
@@ -64,8 +54,8 @@ resource "azurerm_kubernetes_cluster" "aks" {
     network_policy      = "azure"
     load_balancer_sku   = "standard"
 
-    service_cidr       = "10.1.0.0/16"   # Plage interne pour les services (différente du VNet)
-    dns_service_ip     = "10.1.0.10"    # IP du DNS interne (doit être dans le service_cidr)
+    service_cidr   = "10.1.0.0/16" # Plage interne pour les services (différente du VNet)
+    dns_service_ip = "10.1.0.10"   # IP du DNS interne (doit être dans le service_cidr)
   }
 
   # Ajout indispensable pour que le cluster fonctionne
@@ -78,7 +68,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
     azurerm_log_analytics_workspace.law
   ]
 
-} 
+}
 
 
 
