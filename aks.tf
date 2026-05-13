@@ -1,7 +1,4 @@
-data "azuread_group" "aks_admins" {
-  display_name     = var.ad_group_name
-  security_enabled = true
-}
+
 
 
 ##########
@@ -35,7 +32,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
     managed            = true
     azure_rbac_enabled = true
 
-    admin_group_object_ids = [data.azuread_group.aks_admins.object_id]
+    admin_group_object_ids = [var.aks_admin_group_object_id]
   }
 
   # Configuration des Nodes (VMs)

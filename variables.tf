@@ -10,8 +10,9 @@ variable "aks_cluster_name" {
   default = "aks-cluster"
 }
 
-variable "ad_group_name" {
-  default = "aks-admins" # Le nom exact du groupe Entra ID
+variable "aks_admin_group_object_id" {
+  type        = string
+  description = "Object ID du groupe Entra ID aks-admins"
 }
 
 variable "kali_admin_paswd" {
