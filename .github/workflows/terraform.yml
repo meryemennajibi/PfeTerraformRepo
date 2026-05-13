@@ -15,7 +15,7 @@ jobs:
       ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
       ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-      TF_VAR_kali_admin_passwd: ${{ secrets.KALI_ADMIN_PASSWD }}
+      TF_VAR_kali_admin_paswd: ${{ secrets.KALI_ADMIN_PASSWD }}
 
     steps:
       - name: Checkout Repository
