@@ -55,7 +55,7 @@ resource "azurerm_firewall" "fw" {
 resource "azurerm_monitor_diagnostic_setting" "fw_diagnostics" {
   name                       = "diag-firewall-to-sentinel"
   target_resource_id         = azurerm_firewall.fw.id
-  log_analytics_workspace_id = "/subscriptions/42c20bc6-0b17-4863-9dd7-36fb9fb16729/resourceGroups/rg-aks-siso/providers/Microsoft.OperationalInsights/workspaces/law-aks-project"
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.law.id
   enabled_log {
     category_group = "allLogs"
   }
@@ -64,6 +64,10 @@ resource "azurerm_monitor_diagnostic_setting" "fw_diagnostics" {
     category = "AllMetrics"
     enabled  = true
   }
+
+  depends_on = [
+  azurerm_log_analytics_workspace.law
+  ]
 }
 
 # =========================================================
@@ -97,7 +101,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "rules" {
     rule {
       name                = "allow-https-from-f5-waf"
       protocols           = ["TCP"]
-      source_addresses    = ["48.217.49.246"] #F5 public IP 
+      source_addresses    = ["20.98.161.2"] #F5 public IP 
       destination_address = azurerm_public_ip.fw_pip.ip_address
       destination_ports   = ["443"]
       translated_address  = "10.0.1.6"
@@ -170,7 +174,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "rules" {
     rule {
       name                  = "allow-aks"
       protocols             = ["TCP"]
-      source_addresses      = ["48.217.49.246"]
+      source_addresses      = ["20.98.161.2"]
       destination_addresses = ["10.0.1.0/24"]
       destination_ports     = ["443"]
     }

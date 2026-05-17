@@ -30,7 +30,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
   # Bloc RBAC 
   azure_active_directory_role_based_access_control {
     managed            = true
-    azure_rbac_enabled = true
+    azure_rbac_enabled = false
 
     admin_group_object_ids = [var.aks_admin_group_object_id]
   }
@@ -39,7 +39,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
   default_node_pool {
     name                = "systempool"
     node_count          = 2
-    vm_size             = "Standard_D2ads_v6"
+    vm_size             = "Standard_D2s_v4"
     vnet_subnet_id      = azurerm_subnet.aks_subnet.id
     enable_auto_scaling = false
   }

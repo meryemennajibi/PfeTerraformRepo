@@ -26,7 +26,7 @@ resource "azurerm_network_security_rule" "allow_ssh_kali" {
   protocol                    = "Tcp"
   source_port_range           = "*"
   destination_port_range      = "22"
-  source_address_prefix       = "41.251.213.203/32"
+  source_address_prefix       = "41.249.169.102/32"
   destination_address_prefix  = "*"
   resource_group_name         = var.resource_group_name
   network_security_group_name = azurerm_network_security_group.kali_nsg.name
@@ -57,7 +57,7 @@ resource "azurerm_linux_virtual_machine" "kali_vm" {
   name                = "vm-kali"
   resource_group_name = var.resource_group_name
   location            = var.location
-  size                = "Standard_B2s"
+  size                = "Standard_D4ds_v4"
   admin_username      = "kaliuser"
 
   network_interface_ids = [

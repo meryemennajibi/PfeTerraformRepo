@@ -1,7 +1,7 @@
 # 1. Création du Network Security Group personnalisé
 resource "azurerm_network_security_group" "aks_nsg" {
   name                = "nsg-aks-main"
-  location            = "East US" # Doit correspondre à la région de votre cluster
+  location            = var.location
   resource_group_name = "rg-aks-siso"
 
   tags = {
@@ -64,11 +64,11 @@ resource "azurerm_network_security_rule" "deny_all_inbound" {
 
 
 
-# 3. CONFIGURATION DU MONITORING ( LOGS)
+# 3. CONFIGURATION DU MONITORING (LOGS)
 resource "azurerm_monitor_diagnostic_setting" "nsg_security_logs" {
   name                       = "diag-nsg-security-events"
   target_resource_id         = azurerm_network_security_group.aks_nsg.id
-  log_analytics_workspace_id = "/subscriptions/42c20bc6-0b17-4863-9dd7-36fb9fb16729/resourceGroups/rg-aks-siso/providers/Microsoft.OperationalInsights/workspaces/law-aks-project"
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.law.id
 
   enabled_log {
     category = "NetworkSecurityGroupEvent"
@@ -77,14 +77,21 @@ resource "azurerm_monitor_diagnostic_setting" "nsg_security_logs" {
   enabled_log {
     category = "NetworkSecurityGroupRuleCounter"
   }
+
+  depends_on = [
+    azurerm_network_security_group.aks_nsg,
+    azurerm_log_analytics_workspace.law
+  ]
 }
 
 
 # 4. ASSOCIATION (Lien avec Subnet existant)
 resource "azurerm_subnet_network_security_group_association" "aks_nsg_assoc" {
-
   subnet_id                 = azurerm_subnet.aks_subnet.id
   network_security_group_id = azurerm_network_security_group.aks_nsg.id
 
-  depends_on = [azurerm_network_security_group.aks_nsg]
+  depends_on = [
+    azurerm_network_security_group.aks_nsg,
+    azurerm_subnet.aks_subnet
+  ]
 }

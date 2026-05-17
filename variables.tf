@@ -4,7 +4,7 @@ variable "resource_group_name" {
 
 variable "location" {
   description = "La région Azure pour le déploiement"
-  default     = "eastus"
+  default     = "centralus"
 }
 variable "aks_cluster_name" {
   default = "aks-cluster"
