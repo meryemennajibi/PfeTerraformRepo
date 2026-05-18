@@ -1,3 +1,6 @@
+data "azurerm_subscription" "current" {}
+
+
 # 1. IP Publique Standard
 resource "azurerm_public_ip" "fw_pip" {
   name                = "pip-azure-firewall"
@@ -52,10 +55,12 @@ resource "azurerm_firewall" "fw" {
   ]
 }
 
+# 1. Logs réseau / règles Azure Firewall
 resource "azurerm_monitor_diagnostic_setting" "fw_diagnostics" {
   name                       = "diag-firewall-to-sentinel"
   target_resource_id         = azurerm_firewall.fw.id
   log_analytics_workspace_id = azurerm_log_analytics_workspace.law.id
+
   enabled_log {
     category_group = "allLogs"
   }
@@ -64,10 +69,29 @@ resource "azurerm_monitor_diagnostic_setting" "fw_diagnostics" {
     category = "AllMetrics"
     enabled  = true
   }
+}
 
-  depends_on = [
-  azurerm_log_analytics_workspace.law
-  ]
+# 2. Logs administratifs AzureActivity
+resource "azurerm_monitor_diagnostic_setting" "subscription_activity_logs" {
+  name                       = "diag-subscription-activity-to-law"
+  target_resource_id         = data.azurerm_subscription.current.id
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.law.id
+
+  enabled_log {
+    category = "Administrative"
+  }
+
+  enabled_log {
+    category = "Security"
+  }
+
+  enabled_log {
+    category = "Policy"
+  }
+
+  enabled_log {
+    category = "Recommendation"
+  }
 }
 
 # =========================================================
@@ -78,6 +102,13 @@ resource "azurerm_firewall_policy" "fw_policy" {
   resource_group_name = var.resource_group_name
   location            = var.location
   sku                 = "Basic"
+
+##chnagemet
+
+  tags = {
+    SecurityMonitoring = "Enabled"
+    LastSecurityReview = "2026-05-18-v2"
+  }
 
   depends_on          = [azurerm_resource_group.rg]
 }
@@ -101,7 +132,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "rules" {
     rule {
       name                = "allow-https-from-f5-waf"
       protocols           = ["TCP"]
-      source_addresses    = ["20.98.161.2"] #F5 public IP 
+      source_addresses    = ["*"] #F5 public IP 
       destination_address = azurerm_public_ip.fw_pip.ip_address
       destination_ports   = ["443"]
       translated_address  = "10.0.1.6"
