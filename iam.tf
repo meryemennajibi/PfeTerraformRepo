@@ -1,4 +1,13 @@
-#Groupe admin AKS
+# Current users
+data "azuread_user" "cloud_admin" {
+  user_principal_name = "Administrator@techjobsa.onmicrosoft.com"
+}
+
+data "azuread_user" "security_analyst_user" {
+  user_principal_name = "security-analyst@techjobsa.onmicrosoft.com"
+}
+
+# Groupe admin AKS
 resource "azuread_group" "aks_admin" {
   display_name     = "aks-admin"
   security_enabled = true
@@ -16,21 +25,54 @@ resource "azuread_group" "security_analyst" {
   security_enabled = true
 }
 
+# Group memberships
+resource "azuread_group_member" "cloud_admin_aks_admin" {
+  group_object_id  = azuread_group.aks_admin.object_id
+  member_object_id = data.azuread_user.cloud_admin.object_id
+}
+
+resource "azuread_group_member" "cloud_admin_firewall_admin" {
+  group_object_id  = azuread_group.firewall_admin.object_id
+  member_object_id = data.azuread_user.cloud_admin.object_id
+}
+
+resource "azuread_group_member" "security_analyst_member" {
+  group_object_id  = azuread_group.security_analyst.object_id
+  member_object_id = data.azuread_user.security_analyst_user.object_id
+}
+
+# AKS admin role
 resource "azurerm_role_assignment" "aks_admin_cluster_admin" {
   scope                = azurerm_kubernetes_cluster.aks.id
   role_definition_name = "Azure Kubernetes Service RBAC Cluster Admin"
   principal_id         = azuread_group.aks_admin.object_id
+
+  depends_on = [
+    azuread_group_member.cloud_admin_aks_admin
+  ]
 }
 
+# Firewall admin role
 resource "azurerm_role_assignment" "firewall_admin_policy" {
   scope                = azurerm_firewall_policy.fw_policy.id
   role_definition_name = "Network Contributor"
   principal_id         = azuread_group.firewall_admin.object_id
+
+  depends_on = [
+    azuread_group_member.cloud_admin_firewall_admin
+  ]
 }
 
+# Key Vault access for Cloud Administrator
 resource "azurerm_role_assignment" "admin_keyvault_secrets_officer" {
   scope                = azurerm_key_vault.kv.id
   role_definition_name = "Key Vault Secrets Officer"
-  principal_id         = "5dee7852-9587-42c6-a7f5-d10691e1ff6c"
+  principal_id         = data.azuread_user.cloud_admin.object_id
 }
 
+# AKS identity permission on subnet for LoadBalancer creation
+resource "azurerm_role_assignment" "aks_network_contributor_subnet" {
+  scope                = azurerm_subnet.aks_subnet.id
+  role_definition_name = "Network Contributor"
+  principal_id         = azurerm_kubernetes_cluster.aks.identity[0].principal_id
+}

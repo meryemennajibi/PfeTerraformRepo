@@ -132,7 +132,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "rules" {
     rule {
       name                = "allow-https-from-f5-waf"
       protocols           = ["TCP"]
-      source_addresses    = ["*"] #F5 public IP 
+      source_addresses    = ["20.98.161.2"] #F5 public IP 
       destination_address = azurerm_public_ip.fw_pip.ip_address
       destination_ports   = ["443"]
       translated_address  = "10.0.1.6"
