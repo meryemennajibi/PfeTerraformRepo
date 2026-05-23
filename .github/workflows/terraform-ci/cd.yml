@@ -1,4 +1,4 @@
-name: Terraform CI
+name: Terraform CI/CD
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
   pull_request:
 
 jobs:
-  terraform-ci:
+  terraform:
     runs-on: ubuntu-latest
 
     env:
@@ -26,10 +26,14 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Initialize Terraform
-        run: terraform init 
+        run: terraform init -input=false
 
       - name: Validate Terraform Configuration
         run: terraform validate
 
       - name: Generate Terraform Plan
-        run: terraform plan -input=false
+        run: terraform plan -input=false -out=tfplan
+
+      - name: Apply Terraform Plan
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: terraform apply -input=false -auto-approve tfplan

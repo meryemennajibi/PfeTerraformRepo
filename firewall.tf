@@ -209,6 +209,14 @@ resource "azurerm_firewall_policy_rule_collection_group" "rules" {
       destination_addresses = ["10.0.1.0/24"]
       destination_ports     = ["443"]
     }
+
+    rule {
+      name                  = "test-analyst-blocked-change"
+      protocols             = ["TCP"]
+      source_addresses      = ["10.0.1.0/24"]
+      destination_addresses = ["8.8.8.8"]
+      destination_ports     = ["443"]
+    }
   }
 
   # =========================================================
@@ -223,12 +231,15 @@ resource "azurerm_firewall_policy_rule_collection_group" "rules" {
       name             = "allow-aks-required-fqdns"
       source_addresses = ["10.0.1.0/24"]
 
-      destination_fqdns = ["*"]
-
-      protocols {
-        type = "Http"
-        port = 80
-      }
+      destination_fqdns = [
+        "mcr.microsoft.com",
+        "*.data.mcr.microsoft.com",
+        "management.azure.com",
+        "login.microsoftonline.com",
+        "*.blob.core.windows.net",
+        "*.ubuntu.com",
+        "security.ubuntu.com"
+      ]
 
       protocols {
         type = "Https"
