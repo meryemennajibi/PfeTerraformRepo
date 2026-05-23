@@ -24,7 +24,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
   azure_active_directory_role_based_access_control {
     managed                = true
     azure_rbac_enabled     = true
-    admin_group_object_ids = [azuread_group.aks_admin.object_id]
+    admin_group_object_ids = [var.aks_admin_group_object_id]
   }
 
   # =========================
@@ -68,6 +68,5 @@ resource "azurerm_kubernetes_cluster" "aks" {
   depends_on = [
     azurerm_resource_group.rg,
     azurerm_log_analytics_workspace.law,
-    azuread_group.aks_admin
   ]
 }

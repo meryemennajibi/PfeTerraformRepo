@@ -32,3 +32,7 @@ variable "security_analyst_object_id" {
 variable "firewall_admin_group_object_id" {
   type = string
 }
+
+variable "security_analyst_group_object_id" {
+  type = string
+}
