@@ -22,6 +22,7 @@ jobs:
       TF_VAR_firewall_admin_group_object_id: ${{ secrets.FIREWALL_ADMIN_GROUP_OBJECT_ID }}
       TF_VAR_security_analyst_group_object_id: ${{ secrets.SECURITY_ANALYST_GROUP_OBJECT_ID }}
 
+      
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
