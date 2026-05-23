@@ -1,11 +1,4 @@
-# Current users
-data "azuread_user" "cloud_admin" {
-  user_principal_name = "Administrator@techjobsa.onmicrosoft.com"
-}
 
-data "azuread_user" "security_analyst_user" {
-  user_principal_name = "security-analyst@techjobsa.onmicrosoft.com"
-}
 
 # Groupe admin AKS
 resource "azuread_group" "aks_admin" {
@@ -28,17 +21,17 @@ resource "azuread_group" "security_analyst" {
 # Group memberships
 resource "azuread_group_member" "cloud_admin_aks_admin" {
   group_object_id  = azuread_group.aks_admin.object_id
-  member_object_id = data.azuread_user.cloud_admin.object_id
+  member_object_id = var.cloud_admin_object_id
 }
 
 resource "azuread_group_member" "cloud_admin_firewall_admin" {
   group_object_id  = azuread_group.firewall_admin.object_id
-  member_object_id = data.azuread_user.cloud_admin.object_id
+  member_object_id = var.cloud_admin_object_id
 }
 
 resource "azuread_group_member" "security_analyst_member" {
   group_object_id  = azuread_group.security_analyst.object_id
-  member_object_id = data.azuread_user.security_analyst_user.object_id
+  member_object_id = var.security_analyst_object_id
 }
 
 # AKS admin role
@@ -67,7 +60,7 @@ resource "azurerm_role_assignment" "firewall_admin_policy" {
 resource "azurerm_role_assignment" "admin_keyvault_secrets_officer" {
   scope                = azurerm_key_vault.kv.id
   role_definition_name = "Key Vault Secrets Officer"
-  principal_id         = data.azuread_user.cloud_admin.object_id
+  principal_id         = var.cloud_admin_object_id
 }
 
 # AKS identity permission on subnet for LoadBalancer creation

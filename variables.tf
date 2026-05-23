@@ -20,3 +20,11 @@ variable "kali_admin_paswd" {
   type        = string
   sensitive   = true
 }
+
+variable "cloud_admin_object_id" {
+  type = string
+}
+
+variable "security_analyst_object_id" {
+  type = string
+}
