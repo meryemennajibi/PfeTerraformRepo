@@ -1,59 +1,22 @@
-
-
-# Groupe admin AKS
-resource "azuread_group" "aks_admin" {
-  display_name     = "aks-admin"
-  security_enabled = true
-}
-
-# Groupe administrateurs Azure Firewall
-resource "azuread_group" "firewall_admin" {
-  display_name     = "firewall-admin"
-  security_enabled = true
-}
-
-# Groupe analystes sécurité
-resource "azuread_group" "security_analyst" {
-  display_name     = "security-analyst"
-  security_enabled = true
-}
-
-# Group memberships
-resource "azuread_group_member" "cloud_admin_aks_admin" {
-  group_object_id  = azuread_group.aks_admin.object_id
-  member_object_id = var.cloud_admin_object_id
-}
-
-resource "azuread_group_member" "cloud_admin_firewall_admin" {
-  group_object_id  = azuread_group.firewall_admin.object_id
-  member_object_id = var.cloud_admin_object_id
-}
-
-resource "azuread_group_member" "security_analyst_member" {
-  group_object_id  = azuread_group.security_analyst.object_id
-  member_object_id = var.security_analyst_object_id
-}
-
 # AKS admin role
 resource "azurerm_role_assignment" "aks_admin_cluster_admin" {
   scope                = azurerm_kubernetes_cluster.aks.id
   role_definition_name = "Azure Kubernetes Service RBAC Cluster Admin"
-  principal_id         = azuread_group.aks_admin.object_id
-
-  depends_on = [
-    azuread_group_member.cloud_admin_aks_admin
-  ]
+  principal_id         = var.aks_admin_group_object_id
 }
 
 # Firewall admin role
 resource "azurerm_role_assignment" "firewall_admin_policy" {
   scope                = azurerm_firewall_policy.fw_policy.id
   role_definition_name = "Network Contributor"
-  principal_id         = azuread_group.firewall_admin.object_id
+  principal_id         = var.firewall_admin_group_object_id
+}
 
-  depends_on = [
-    azuread_group_member.cloud_admin_firewall_admin
-  ]
+# Security Analyst role on Sentinel / Log Analytics
+resource "azurerm_role_assignment" "security_analyst_law" {
+  scope                = azurerm_log_analytics_workspace.law.id
+  role_definition_name = "Microsoft Sentinel Reader"
+  principal_id         = var.security_analyst_group_object_id
 }
 
 # Key Vault access for Cloud Administrator

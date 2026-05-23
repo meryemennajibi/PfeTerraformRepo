@@ -28,3 +28,7 @@ variable "cloud_admin_object_id" {
 variable "security_analyst_object_id" {
   type = string
 }
+
+variable "firewall_admin_group_object_id" {
+  type = string
+}
