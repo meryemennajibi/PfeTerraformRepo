@@ -6,10 +6,6 @@ on:
     types:
       - completed
 
-permissions:
-  id-token: write
-  contents: read
-
 jobs:
   terraform-cd:
     if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' }}
@@ -41,16 +37,5 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -input=false -auto-approve
 
-      - name: Azure Login
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.ARM_CLIENT_ID }}
-          tenant-id: ${{ secrets.ARM_TENANT_ID }}
-          subscription-id: ${{ secrets.ARM_SUBSCRIPTION_ID }}
 
-      - name: Get AKS credentials
-        run: az aks get-credentials --resource-group rg-aks-siso --name aks-cluster --overwrite-existing
-
-      - name: Deploy Kubernetes manifests
-        run: kubectl apply -f ../K8s-manifests/
 
