@@ -18,9 +18,9 @@ resource "azurerm_kubernetes_cluster" "aks" {
     type = "SystemAssigned"
   }
 
-  # =========================
+  # ==================================================
   # Authentification Entra ID + Azure RBAC
-  # =========================
+  # ==================================================
   azure_active_directory_role_based_access_control {
     managed                = true
     azure_rbac_enabled     = true
@@ -51,16 +51,16 @@ resource "azurerm_kubernetes_cluster" "aks" {
     dns_service_ip = "10.1.0.10"
   }
 
-  # =========================
+  # ==========================================
   # Supervision Container Insights
-  # =========================
+  # ==========================================
   oms_agent {
     log_analytics_workspace_id = azurerm_log_analytics_workspace.law.id
   }
 
-  # =========================
+  # ================================
   # Intégration Key Vault CSI Driver
-  # =========================
+  # ================================
   key_vault_secrets_provider {
     secret_rotation_enabled = true
   }

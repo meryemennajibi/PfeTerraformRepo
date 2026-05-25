@@ -1,6 +1,8 @@
+# =========================================================
+# 1. Adresse IP publique pour la VM Kali
+# =========================================================
 
 
-# Public IP for Kali
 resource "azurerm_public_ip" "kali_pip" {
   name                = "pip-kali"
   location            = var.location
@@ -10,35 +12,23 @@ resource "azurerm_public_ip" "kali_pip" {
   depends_on          = [azurerm_resource_group.rg]
 }
 
-# NSG for Kali
-resource "azurerm_network_security_group" "kali_nsg" {
-  name                = "nsg-kali"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-}
 
-# Allow SSH only from your public IP
-resource "azurerm_network_security_rule" "allow_ssh_kali" {
-  name                        = "Allow-SSH-MyIP"
-  priority                    = 100
-  direction                   = "Inbound"
-  access                      = "Allow"
-  protocol                    = "Tcp"
-  source_port_range           = "*"
-  destination_port_range      = "22"
-  source_address_prefix       = "41.249.169.102/32"
-  destination_address_prefix  = "*"
-  resource_group_name         = var.resource_group_name
-  network_security_group_name = azurerm_network_security_group.kali_nsg.name
-}
+# =========================================================
+# 4. Association du NSG au sous-réseau Kali
+# =========================================================
 
-# Associate NSG with Kali subnet
+
 resource "azurerm_subnet_network_security_group_association" "kali_nsg_assoc" {
   subnet_id                 = azurerm_subnet.kali_subnet.id
   network_security_group_id = azurerm_network_security_group.kali_nsg.id
 }
 
-# Network interface
+
+# =========================================================
+# 5. Interface réseau de la VM Kali
+# =========================================================
+
+
 resource "azurerm_network_interface" "kali_nic" {
   name                = "nic-kali"
   location            = var.location
@@ -52,7 +42,12 @@ resource "azurerm_network_interface" "kali_nic" {
   }
 }
 
-# Kali Linux VM
+
+# =========================================================
+# 6. Machine virtuelle Kali Linux
+# =========================================================
+
+
 resource "azurerm_linux_virtual_machine" "kali_vm" {
   name                = "vm-kali"
   resource_group_name = var.resource_group_name
@@ -65,8 +60,7 @@ resource "azurerm_linux_virtual_machine" "kali_vm" {
   ]
 
   disable_password_authentication = false
-
-  admin_password = var.kali_admin_paswd
+  admin_password                  = var.kali_admin_paswd
 
   os_disk {
     name                 = "osdisk-kali"
@@ -89,7 +83,4 @@ resource "azurerm_linux_virtual_machine" "kali_vm" {
   }
 }
 
-# Output public IP
-output "kali_public_ip" {
-  value = azurerm_public_ip.kali_pip.ip_address
-}
+
