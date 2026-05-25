@@ -1,0 +1,40 @@
+name: Terraform CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  terraform-ci:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./Terraform
+
+    env:
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      TF_VAR_kali_admin_paswd: ${{ secrets.KALI_ADMIN_PASSWD }}
+      TF_VAR_aks_admin_group_object_id: ${{ secrets.AKS_ADMIN_GROUP_OBJECT_ID }}
+      TF_VAR_cloud_admin_object_id: ${{ secrets.CLOUD_ADMIN_OBJECT_ID }}
+      TF_VAR_security_analyst_object_id: ${{ secrets.SECURITY_ANALYST_OBJECT_ID }}
+      TF_VAR_firewall_admin_group_object_id: ${{ secrets.FIREWALL_ADMIN_GROUP_OBJECT_ID }}
+      TF_VAR_security_analyst_group_object_id: ${{ secrets.SECURITY_ANALYST_GROUP_OBJECT_ID }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init -input=false
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -input=false
