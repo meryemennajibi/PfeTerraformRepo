@@ -18,7 +18,7 @@ resource "azurerm_role_assignment" "aks_admin_cluster_admin" {
 resource "azurerm_role_assignment" "firewall_admin_policy" {
   scope                = azurerm_firewall_policy.fw_policy.id
   role_definition_name = "Network Contributor"
-  principal_id         = ar.cloud_admin_object_id
+  principal_id         = var.cloud_admin_object_id
 }
 
 
