@@ -1,0 +1,59 @@
+#Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: juice-shop
+  labels:
+    app: juice-shop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: juice-shop
+  template:
+    metadata:
+      labels:
+        app: juice-shop
+    spec:
+      containers:
+        - name: juice-shop
+          image: bkimminich/juice-shop
+          ports:
+            - containerPort: 3000
+
+#Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: juice-shop-service
+spec:
+  selector:
+    app: juice-shop
+  ports:
+    - port: 80
+      targetPort: 3000
+  type: ClusterIP
+
+
+#Ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: juice-shop-ingress
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - app.juice.nip.io
+      secretName: dummy-tls
+  rules:
+    - host: app.juice.nip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: juice-shop-service
+                port:
+                  number: 80
