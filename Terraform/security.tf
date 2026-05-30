@@ -203,7 +203,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "rules" {
   priority           = 100
 
   # =========================================================
-  #  DNAT : Exposer ton application (Ingress NGINX)
+  #  DNAT : Exposer l' application (Ingress NGINX)
   # =========================================================
   nat_rule_collection {
     name     = "dnat-juiceshop"
