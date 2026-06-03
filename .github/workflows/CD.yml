@@ -34,7 +34,7 @@ jobs:
       - name: Terraform Init
         run: terraform init -input=false
 
-            - name: Terraform Import existing role assignment
+      - name: Terraform Import existing role assignment
         run: |
           terraform import -input=false \
             azurerm_role_assignment.security_analyst_firewall_network_contributor \
