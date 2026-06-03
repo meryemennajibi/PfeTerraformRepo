@@ -545,12 +545,22 @@ resource "azurerm_role_assignment" "aks_admin_cluster_admin" {
 # =========================================================
 
 
-resource "azurerm_role_assignment" "firewall_admin_policy" {
-  scope                = azurerm_firewall_policy.fw_policy.id
+resource "azurerm_role_assignment" "firewall_admin_network_contributor" {
+  scope                = azurerm_firewall.fw.id
   role_definition_name = "Network Contributor"
-  principal_id         = var.cloud_admin_object_id
+  principal_id         = var.firewall_admin_group_object_id
 }
 
+
+# =========================================================
+# Accès Firewall pour l’analyste sécurité
+# =========================================================
+
+resource "azurerm_role_assignment" "security_analyst_firewall_network_contributor" {
+  scope                = azurerm_firewall.fw.id
+  role_definition_name = "Network Contributor"
+  principal_id         = var.security_analyst_group_object_id
+}
 
 # =========================================================
 # 3. Rôle analyste sécurité sur Sentinel / Log Analytics

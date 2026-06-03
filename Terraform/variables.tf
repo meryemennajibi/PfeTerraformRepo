@@ -58,3 +58,13 @@ variable "security_analyst_group_object_id" {
   description = "Object ID du groupe analyste sécurité"
   type        = string
 }
+
+variable "firewall_admin_group_object_id" {
+  description = "Object ID du groupe Entra ID firewall-admin"
+  type        = string
+}
+
+variable "security_analyst_group_object_id" {
+  description = "Object ID du groupe Entra ID security-analyst"
+  type        = string
+}
