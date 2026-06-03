@@ -36,8 +36,8 @@ jobs:
       - name: Terraform Validate
         run: terraform validate
       
-      - name: Terraform Force Unlock
-        run: terraform force-unlock -force d4793f2e-8141-b256-e78f-6eff5c324da9
+      - name: Terraform Import Existing Role Assignment
+        run: terraform import azurerm_role_assignment.security_analyst_firewall_network_contributor /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/providers/Microsoft.Authorization/roleAssignments/232d4c8a0a49dbaae27ab71ee1bafff5
 
       - name: Terraform Plan
         run: terraform plan -input=false
