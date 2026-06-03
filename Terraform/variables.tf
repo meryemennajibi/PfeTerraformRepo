@@ -64,7 +64,3 @@ variable "firewall_admin_group_object_id" {
   type        = string
 }
 
-variable "security_analyst_group_object_id" {
-  description = "Object ID du groupe Entra ID security-analyst"
-  type        = string
-}
