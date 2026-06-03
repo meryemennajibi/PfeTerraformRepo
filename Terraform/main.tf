@@ -378,14 +378,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "rules" {
       destination_ports     = ["443"]
     }
 
-    #  HTTP
-    rule {
-      name                  = "allow-http-outbound"
-      protocols             = ["TCP"]
-      source_addresses      = ["10.0.1.0/24"]
-      destination_addresses = ["*"]
-      destination_ports     = ["80"]
-    }
+  
 
 
     #  External AKS IP access inbound
@@ -397,13 +390,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "rules" {
       destination_ports     = ["443"]
     }
 
-    rule {
-      name                  = "test-analyst-blocked-change"
-      protocols             = ["TCP"]
-      source_addresses      = ["10.0.1.0/24"]
-      destination_addresses = ["8.8.8.8"]
-      destination_ports     = ["443"]
-    }
+    
   }
 
   # =========================================================
