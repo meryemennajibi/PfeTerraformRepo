@@ -34,13 +34,6 @@ jobs:
       - name: Terraform Init
         run: terraform init -input=false
 
-      - name: Terraform Import existing role assignment
-        run: |
-          terraform import -input=false \
-            azurerm_role_assignment.security_analyst_firewall_network_contributor \
-            "/subscriptions/8cbbdc36-8d1d-400e-b5a3-45d0b7797e6e/providers/Microsoft.Authorization/roleAssignments/232d4c8a0a49dbaae27ab71ee1baf1f5" || true
-
-
       - name: Terraform Apply
         run: terraform apply -input=false -auto-approve
 

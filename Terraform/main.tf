@@ -556,11 +556,11 @@ resource "azurerm_role_assignment" "firewall_admin_network_contributor" {
 # Accès Firewall pour l’analyste sécurité
 # =========================================================
 
-resource "azurerm_role_assignment" "security_analyst_firewall_network_contributor" {
-  scope                = azurerm_firewall.fw.id
-  role_definition_name = "Network Contributor"
-  principal_id         = var.security_analyst_group_object_id
-}
+#resource "azurerm_role_assignment" "security_analyst_firewall_network_contributor" {
+#  scope                = azurerm_firewall.fw.id
+#  role_definition_name = "Network Contributor"
+#  principal_id         = var.security_analyst_group_object_id
+#}
 
 
 # =========================================================
