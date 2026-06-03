@@ -569,7 +569,7 @@ resource "azurerm_role_assignment" "security_analyst_firewall_network_contributo
 
 resource "azurerm_role_assignment" "security_analyst_law" {
   scope                = azurerm_log_analytics_workspace.law.id
-  role_definition_name = "Microsoft Sentinel Reader"
+  role_definition_name = "Microsoft Sentinel Responder"
   principal_id         = var.security_analyst_group_object_id
 }
 
