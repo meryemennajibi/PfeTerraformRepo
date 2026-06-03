@@ -35,9 +35,6 @@ jobs:
 
       - name: Terraform Validate
         run: terraform validate
-      
-      - name: Terraform Import Existing Role Assignment
-        run: terraform import azurerm_role_assignment.security_analyst_firewall_network_contributor /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/providers/Microsoft.Authorization/roleAssignments/232d4c8a0a49dbaae27ab71ee1bafff5
 
       - name: Terraform Plan
         run: terraform plan -input=false
