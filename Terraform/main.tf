@@ -562,6 +562,7 @@ resource "azurerm_role_assignment" "security_analyst_firewall_network_contributo
   principal_id         = var.security_analyst_group_object_id
 }
 
+
 # =========================================================
 # 3. Rôle analyste sécurité sur Sentinel / Log Analytics
 # =========================================================
